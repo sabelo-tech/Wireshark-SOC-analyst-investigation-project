@@ -1,40 +1,139 @@
-# Wireshark-SOC-analyst-investigation-project
+Wireshark SOC Investigations — Malware, Reconnaissance & DNS Exfiltration Analysis
 
-#  Home SOC Lab — Threat Detection & Incident Response
 
-![Status](https://img.shields.io/badge/Status-Complete-success)
-![Platform](https://img.shields.io/badge/Platform-Splunk%20%7C%20Suricata%20%7C%20Sysmon-blue)
+![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
+![Platform](https://img.shields.io/badge/Platform-Wireshark-1679A7)
 ![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-5%20Techniques-orange)
 ![IR Reports](https://img.shields.io/badge/IR%20Reports-3%20Complete-green)
 
 
-A fully operational Security Operations Center built from scratch to demonstrate end-to-end threat detection, investigation, and incident response capabilities.
-Built by Sabelo Eugene Moyo 
+A packet-level investigation portfolio built to demonstrate SOC Tier 1 analyst skills across three distinct attack categories, using the same Alert → Filter → Inspect → Correlate → Document process a real analyst follows on a live alert.
+
+Built by Sabelo Moyo
 
 ---
  <h1>🎯 Project Overview</h1>
-This project showcases practical SOC analyst skills through a complete security operations environment. I built a multi-platform SOC lab using industry-standard tools (Splunk, Suricata IDS, Sysmon) to detect, investigate, and document real-world attack scenarios mapped to the MITRE ATT&CK framework.
+This project analyzes real (safely sourced) packet captures to investigate three genuinely different categories of SOC incident: a malware infection with command-and-control beaconing, a network reconnaissance and brute-force intrusion attempt, and a DNS tunneling exfiltration channel. Each investigation starts from a written alert scenario, not a blank pcap and ends in a formal incident report mapped to MITRE ATT&CK.
 
 ## Why This Project Matters:
 
-- Demonstrates hands-on experience with SIEM platforms, not just theoretical knowledge
-- Shows ability to write custom detection rules and investigate security incidents
-- Proves capability to document findings in professional incident response reports
-- Validates understanding of adversary tactics, techniques, and procedures (TTPs)
+- Demonstrates hands-on packet analysis skills, not just filter syntax memorized from a cheat sheet
+- Shows the ability to tell a real threat apart from background noise across three different traffic shapes
+- Proves the ability to document findings in a professional, audience-ready incident response format
+- Validates understanding of adversary TTPs across delivery, reconnaissance, and exfiltration stages, not just one attack type
 
 ---
-  <h1>🏗️ Architecture</h1>
-<h2>Environment Overview</h2>
+  <h1>🏗️ Investigation Types</h1>
 
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Investigation Type</th>
+      <th>What It Simulates</th>
+      <th>Source</th>
+      <th>MITRE ATT&CK</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><strong>Malware Delivery & C2 Beaconing</strong></td>
+      <td>An infected endpoint downloading a payload and checking in with external infrastructure on a schedule</td>
+      <td>malware-traffic-analysis.net</td>
+      <td>T1105, T1071</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>Network Reconnaissance & Brute-Force</strong></td>
+      <td>Port scanning and repeated login attempts against exposed services</td>
+      <td>NETRESEC honeypot captures / SANS ISC</td>
+      <td>T1595, T1110</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>DNS Tunneling & Data Exfiltration</strong></td>
+      <td>Abuse of DNS as a covert channel to move data out undetected</td>
+      <td>Active Countermeasures (dnscat2) / Elastic examples (iodine)</td>
+      <td>T1048.001, T1071.004</td>
+    </tr>
+  </tbody>
+</table>
 
-| Component          | Technology                     | Purpose                                         |
-|--------------------|--------------------------------|-------------------------------------------------|
-| **SIEM**           | Splunk Enterprise 9.2          | Central log aggregation, correlation, alerting  |
-| **Network IDS**    | Suricata                       | Network traffic monitoring, signature detection |
-| **Windows Telemetry** | Sysmon (SwiftOnSecurity config) | Process creation, network connections, file events |
-| **Linux Telemetry** | auditd                        | System call auditing, security events           |
-| **Attack Platform** | Kali Linux                    | Adversary simulation and penetration testing    |
-| **Virtualization** | VirtualBox 7.0                 | Isolated lab environment                        |
+<h2>Tools & Methodology</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Tool</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Packet Analysis</strong></td>
+      <td>Wireshark 4.x</td>
+      <td>Core investigation tool for all three cases</td>
+    </tr>
+    <tr>
+      <td><strong>Traffic Orientation</strong></td>
+      <td>Statistics → Protocol Hierarchy, Conversations</td>
+      <td>First pass on any new capture, before filtering</td>
+    </tr>
+    <tr>
+      <td><strong>Stream Reassembly</strong></td>
+      <td>Follow TCP / HTTP / TLS Stream</td>
+      <td>Reads a conversation as a transcript, not packet-by-packet</td>
+    </tr>
+    <tr>
+      <td><strong>Artifact Extraction</strong></td>
+      <td>Export Objects + SHA256 hashing</td>
+      <td>Safely pulls transferred files without ever executing them</td>
+    </tr>
+    <tr>
+      <td><strong>Threat Intel Lookup</strong></td>
+      <td>VirusTotal, AbuseIPDB, urlscan.io</td>
+      <td>Verifies extracted IOCs against known-bad infrastructure</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>Step</th>
+      <th>Action</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1</strong></td>
+      <td><strong>Alert</strong></td>
+      <td>Write a one-line simulated SIEM/IDS trigger before opening the capture</td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td><strong>Filter</strong></td>
+      <td>Narrow the haystack with targeted display filters and Statistics views</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td><strong>Inspect</strong></td>
+      <td>Drill into headers, follow reassembled streams, extract artifacts</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td><strong>Correlate</strong></td>
+      <td>Connect the anomaly to surrounding traffic, timing, and infrastructure</td>
+    </tr>
+    <tr>
+      <td><strong>5</strong></td>
+      <td><strong>Document</strong></td>
+      <td>Write the finding as a formal report with a confidence level and a recommended action</td>
+    </tr>
+  </tbody>
+</table>
 
 
 ## Steps
